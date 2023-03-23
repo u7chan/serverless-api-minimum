@@ -1,15 +1,18 @@
 service: hello-serverless-api
-frameworkVersion: "3"
+frameworkVersion: '3'
 
 provider:
   name: aws
   profile: default
   stage: dev
-  region: ap-southeast-2
+  region: ap-northeast-1
   runtime: nodejs18.x
+
+plugins:
+  - serverless-offline
 
 functions:
   api:
     handler: src/index.handler
     events:
-      - httpApi: "*"
+      - httpApi: '*'
