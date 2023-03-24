@@ -2,14 +2,14 @@
 
 ## Usage
 
-Deploy
+- Deploy to AWS resources
 
-```bash
-sls deploy
-```
+  ```bash
+  yarn deploy
+  ```
 
-Remove
+- Remove a AWS resources
 
-```bash
-sls remove
-```
+  ```bash
+  yarn destroy
+  ```
