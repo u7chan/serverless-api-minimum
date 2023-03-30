@@ -1,18 +1,24 @@
-import serverless, { Handler } from 'serverless-http'
-import express, { Express, Request, Response, NextFunction } from 'express'
-import HttpStatus from 'http-status-codes'
-import { example } from './example'
+import express from 'express'
+import { Server } from 'http'
+import { NestFactory } from '@nestjs/core'
+import { ExpressAdapter } from '@nestjs/platform-express'
+import { Context, Handler } from 'aws-lambda'
+import { createServer, proxy } from 'aws-serverless-express'
+import { AppModule } from './appModule'
 
-const app: Express = express()
+async function bootstrap(): Promise<Server> {
+  const expressApp = express()
+  const adapter = new ExpressAdapter(expressApp)
+  const nestApp = await NestFactory.create(AppModule, adapter)
+  await nestApp.init()
+  return createServer(expressApp)
+}
 
-app.get('/example', (_req: Request, res: Response, _next: NextFunction) => {
-  return res.status(HttpStatus.OK).json(example())
-})
+let cachedServer: Server
 
-app.use((_req: Request, res: Response, _next: NextFunction) => {
-  return res.status(HttpStatus.NOT_FOUND).json({
-    error: 'Not Found',
-  })
-})
-
-export const handler: Handler = serverless(app)
+export const handler: Handler = async (event: any, context: Context) => {
+  if (!cachedServer) {
+    cachedServer = await bootstrap()
+  }
+  return proxy(cachedServer, event, context, 'PROMISE').promise
+}

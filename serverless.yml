@@ -15,4 +15,9 @@ functions:
   api:
     handler: dist/index.handler
     events:
-      - httpApi: '*'
+      - http:
+          path: '/'
+          method: any
+      - http:
+          path: '{proxy+}'
+          method: any
